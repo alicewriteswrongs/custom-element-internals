@@ -27,13 +27,18 @@ class CustomTextInput extends HTMLElement {
     this.__value = false;
   }
 
+  inputEl() {
+    return this.shadowRoot.querySelector("input");
+  }
+
   spanEl() {
     return this.shadowRoot.querySelector("span");
   }
 
   // This setter handles echoing the updated value out to the associated form
-  // instance via the `setFormValue` method and also updating our little
-  // `<span>` tag to show the current value of the input
+  // instance via the `setFormValue` method, updating our little `<span>` tag
+  // to show the current value of the input, and also ensuring that the
+  // validation state is up-to-date.
   //
   // Note that we don't need to pass a name or anything to `setFormValue`.
   // Instead, the browser will look at the `name` attr on the instance of our
@@ -41,12 +46,12 @@ class CustomTextInput extends HTMLElement {
   //
   // This is perhaps a bit more 'manual' than I thought this would be, but
   // there's a lot of flexibility here with this type of imperative interface
-  // to the underlying form. You could easily add, for instance, custom
-  // validation in your `onchange` or `oninput` handler
+  // to the underlying form.
   set value(v) {
     this.__value = v;
     this.internals_.setFormValue(v);
     this.spanEl().textContent = `Current value: ${v}`;
+    this.manageValidity();
   }
   get value() {
     return this.__value;
@@ -72,12 +77,37 @@ class CustomTextInput extends HTMLElement {
     return this.internals_.willValidate;
   }
 
+  // check whether or not the input is valid without trigger a report
+  // (i.e. a user-visible "this isn't valid" popup)
   checkValidity() {
     return this.internals_.checkValidity();
   }
 
+  // report to the user on the validity. is a UI no-op if it's valid, else
+  // shows a browser-native validation popup with the currently-set validation
+  // message
   reportValidity() {
     return this.internals_.reportValidity();
+  }
+
+  // this function reads the current value and then sets the validity state
+  // based on that. This is a really simple one where we're just checking that
+  // the user has made _some_ input (we don't care what it is)
+  manageValidity() {
+    if (this.value === "" || !this.value) {
+      this.internals_.setValidity(
+        // the first argument is an object with various flags we can set. See
+        // here: https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setValidity#parameters
+        { valueMissing: true },
+        // then our custom validation message
+        "Hey, you've got to fill this in!",
+        // then (optionally) an anchor for where the validation message popup
+        // should show up
+        this.inputEl(),
+      );
+    } else {
+      this.internals_.setValidity({});
+    }
   }
 
   connectedCallback() {
@@ -114,7 +144,9 @@ class CustomTextInput extends HTMLElement {
     }`;
     this.shadowRoot.appendChild(style);
 
-    // attach the input element to the shadow DOM
+    // set this so that the input always has a presence within it's associated
+    // form
+    this.value = "";
   }
 }
 
