@@ -27,7 +27,7 @@ class CustomCheckbox extends HTMLElement {
     this.__value = false;
   }
 
-  inputEl () {
+  inputEl() {
     return this.shadowRoot.querySelector("input");
   }
 
@@ -36,15 +36,29 @@ class CustomCheckbox extends HTMLElement {
     this.inputEl().checked = this.__value;
     this.internals_.setFormValue(this.__value);
   }
-  get value() { return this.__value; }
+  get value() {
+    return this.__value;
+  }
 
   // a bunch of getters for various things (mostly for convenience)
-  get form() { return this.internals_.form; }
-  get name() { return this.getAttribute('name'); }
-  get type() { return this.localName; }
-  get validity() { return this.internals_.validity; }
-  get validationMessage() { return this.internals_.validationMessage; }
-  get willValidate() { return this.internals_.willValidate; }
+  get form() {
+    return this.internals_.form;
+  }
+  get name() {
+    return this.getAttribute("name");
+  }
+  get type() {
+    return this.localName;
+  }
+  get validity() {
+    return this.internals_.validity;
+  }
+  get validationMessage() {
+    return this.internals_.validationMessage;
+  }
+  get willValidate() {
+    return this.internals_.willValidate;
+  }
 
   checkValidity() {
     return this.internals_.checkValidity();
@@ -54,7 +68,7 @@ class CustomCheckbox extends HTMLElement {
     return this.internals_.reportValidity();
   }
 
-  connectedCallback () {
+  connectedCallback() {
     // Create a shadow root
     this.attachShadow({ mode: "open" }); // sets and returns 'this.shadowRoot'
 
@@ -74,8 +88,8 @@ class CustomCheckbox extends HTMLElement {
     // This is perhaps a bit more 'manual' than I thought this would be, but
     // there's a lot of flexibility here with this type of imperative interface
     // to the underlying form. You could easily add, for instance, custom
-    // validation in your `onchange` or `oninput` handler 
-    input.onchange = ev => {
+    // validation in your `onchange` or `oninput` handler
+    input.onchange = (ev) => {
       this.__value = !!ev.target.value;
       this.internals_.setFormValue(this.value);
     };

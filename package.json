@@ -5,7 +5,8 @@
   "main": "internals.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server ."
+    "start": "http-server .",
+    "fmt": "prettier --write *.js *.html"
   },
   "author": "",
   "license": "ISC",
