@@ -11,14 +11,38 @@
     <script type="module" src="/internals.js"></script>
   </head>
   <body>
-    <h1>Simple checkbox form</h1>
-    <form>
-      <custom-checkbox name="test-checkbox"></custom-checkbox>
-      <label for="test-checkbox">Test Checkbox</label>
+    <h1>Simple text input form</h1>
+    <form id="text-input-form" onsubmit>
+      <custom-text-input
+        id="test-text-input"
+        name="text-input"
+      ></custom-text-input>
+      <div><input type="submit" /></div>
     </form>
     <h1>Dessert validation form</h1>
     <form></form>
     <h1>JSON validation form</h1>
     <form></form>
+
+    <script>
+      // set up loggers for the forms
+      // first a little function to log the contents of a form
+      function logForm(formEl) {
+        const formId = formEl.getAttribute("id");
+        const fd = new FormData(formEl);
+
+        console.log(`Values in ${formId}:`);
+        for (const [k, v] of fd.entries()) {
+          console.log(`  ${k}: ${v}`);
+        }
+      }
+
+      // then add it to each form's `onsubmit`
+      const simpleTextInputForm = document.querySelector("#text-input-form");
+      simpleTextInputForm.onsubmit = (e) => {
+        e.preventDefault();
+        logForm(simpleTextInputForm);
+      };
+    </script>
   </body>
 </html>

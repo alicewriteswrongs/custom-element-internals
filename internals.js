@@ -1,6 +1,6 @@
-// This is a pretty basic 'checkbox' component using `ElementInternals` which
+// This is a pretty basic text input component using `ElementInternals` which
 // is minimalist to the point of being essentially useless (it doesn't offer
-// any functionality beyond what you get from just `<input type="checkbox">`
+// any functionality beyond what you get from just `<input type="text">`
 // and in fact it merely wraps such an input!)
 //
 // However, it's useful as a simple example which is documented with a bunch of
@@ -12,10 +12,10 @@
 //    the browser.
 // 2. Boilerplate for echoing the value of its `<input>` element out to the
 //    form it resides within.
-// 3. Validation (where it's valid when checked and invalid otherwise). Since
+// 3. Validation (where it's valid when filled out and invalid otherwise). Since
 //    this is using the `ElementInternals` validation APIs it should prevent
 //    submission of the form as long as it's invalid.
-class CustomCheckbox extends HTMLElement {
+class CustomTextInput extends HTMLElement {
   // we have to set this to true! See
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals#examples
   static formAssociated = true;
@@ -27,14 +27,26 @@ class CustomCheckbox extends HTMLElement {
     this.__value = false;
   }
 
-  inputEl() {
-    return this.shadowRoot.querySelector("input");
+  spanEl() {
+    return this.shadowRoot.querySelector("span");
   }
 
+  // This setter handles echoing the updated value out to the associated form
+  // instance via the `setFormValue` method and also updating our little
+  // `<span>` tag to show the current value of the input
+  //
+  // Note that we don't need to pass a name or anything to `setFormValue`.
+  // Instead, the browser will look at the `name` attr on the instance of our
+  // CE to figure out what name to insert in the formdata.
+  //
+  // This is perhaps a bit more 'manual' than I thought this would be, but
+  // there's a lot of flexibility here with this type of imperative interface
+  // to the underlying form. You could easily add, for instance, custom
+  // validation in your `onchange` or `oninput` handler
   set value(v) {
-    this.__value = !!v;
-    this.inputEl().checked = this.__value;
-    this.internals_.setFormValue(this.__value);
+    this.__value = v;
+    this.internals_.setFormValue(v);
+    this.spanEl().textContent = `Current value: ${v}`;
   }
   get value() {
     return this.__value;
@@ -73,37 +85,37 @@ class CustomCheckbox extends HTMLElement {
     this.attachShadow({ mode: "open" }); // sets and returns 'this.shadowRoot'
 
     const input = document.createElement("input");
-    input.setAttribute("type", "checkbox");
-
-    const that = this;
+    input.setAttribute("type", "text");
 
     // This `onchange` handler which we attach to the `<input>` el inside of
     // our CE's shadow DOM will take care of echoing its value out to the
-    // form.
-    //
-    // Note that we don't need to pass a name or anything here - the browser
-    // will look at the `name` attr on the instance of our CE to figure out
-    // what name to insert in the formdata.
-    //
-    // This is perhaps a bit more 'manual' than I thought this would be, but
-    // there's a lot of flexibility here with this type of imperative interface
-    // to the underlying form. You could easily add, for instance, custom
-    // validation in your `onchange` or `oninput` handler
-    input.onchange = (ev) => {
-      this.__value = !!ev.target.value;
-      this.internals_.setFormValue(this.value);
+    // form. This can just use the setter we created above for `this.value`.
+    input.oninput = (ev) => {
+      ev.preventDefault();
+      const value = ev.target.value;
+      this.value = value;
     };
+    this.shadowRoot.append(input);
+
+    // we'll do a little hacky 'reactive' thing with a span to show the
+    // current value
+    const span = document.createElement("span");
+    this.shadowRoot.append(span);
 
     // Create some CSS to apply to the shadow DOM
     const style = document.createElement("style");
     style.textContent = `:host {
-      margin: 10px;
+      margin: 10px 0 ;
+      display: block;
+    }
+
+    :host span {
+      margin-left: 5px;
     }`;
+    this.shadowRoot.appendChild(style);
 
     // attach the input element to the shadow DOM
-    this.shadowRoot.append(input);
-    this.shadowRoot.appendChild(style);
   }
 }
 
-window.customElements.define("custom-checkbox", CustomCheckbox);
+window.customElements.define("custom-text-input", CustomTextInput);
