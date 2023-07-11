@@ -145,7 +145,7 @@ class CustomTextInput extends HTMLElement {
     this.shadowRoot.appendChild(style);
 
     // set this so that the input always has a presence within it's associated
-    // form
+    // form. this will also initialize the validation state correctly.
     this.value = "";
   }
 }
