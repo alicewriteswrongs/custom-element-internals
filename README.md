@@ -17,3 +17,7 @@ npm start
 
 This just starts a simple http serve in the directory, there's no build step
 because this is just HTML and JS.
+
+In the example the 'submit' button will log the current state of the form to
+the console so you can check it out. Try inspecting the element, getting a
+reference to the custom element and looking at its properties and methods, etc.
