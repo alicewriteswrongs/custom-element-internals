@@ -50,6 +50,9 @@ class CustomTextInput extends HTMLElement {
   set value(v) {
     this.__value = v;
     this.internals_.setFormValue(v);
+    // we 'reactively' by which I mean 'imperatively and synchronously' set
+    // the `textContent` of our little span so that we can see the current
+    // value
     this.spanEl().textContent = `Current value: ${v}`;
     this.manageValidity();
   }
@@ -111,8 +114,9 @@ class CustomTextInput extends HTMLElement {
   }
 
   connectedCallback() {
-    // Create a shadow root
-    this.attachShadow({ mode: "open" }); // sets and returns 'this.shadowRoot'
+    // Create a shadow root which we'll used to hold the HTML elements for our
+    // simple element.
+    this.attachShadow({ mode: "open" });
 
     const input = document.createElement("input");
     input.setAttribute("type", "text");
