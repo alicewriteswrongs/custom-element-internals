@@ -28,11 +28,11 @@ class CustomTextInput extends HTMLElement {
   }
 
   inputEl() {
-    return this.shadowRoot.querySelector("input");
+    return this.querySelector("input");
   }
 
   spanEl() {
-    return this.shadowRoot.querySelector("span");
+    return this.querySelector("span");
   }
 
   // This setter handles echoing the updated value out to the associated form
@@ -49,7 +49,7 @@ class CustomTextInput extends HTMLElement {
   // to the underlying form.
   set value(v) {
     this.__value = v;
-    this.internals_.setFormValue(v);
+    this.internals_.setFormValue(v + "__test");
     // we 'reactively' by which I mean 'imperatively and synchronously' set
     // the `textContent` of our little span so that we can see the current
     // value
@@ -116,7 +116,9 @@ class CustomTextInput extends HTMLElement {
   connectedCallback() {
     // Create a shadow root which we'll used to hold the HTML elements for our
     // simple element.
-    this.attachShadow({ mode: "open" });
+    // this.attachShadow({ mode: "open" });
+
+    this.children.append
 
     const input = document.createElement("input");
     input.setAttribute("type", "text");
@@ -129,12 +131,12 @@ class CustomTextInput extends HTMLElement {
       const value = ev.target.value;
       this.value = value;
     };
-    this.shadowRoot.append(input);
+    this.append(input);
 
     // we'll do a little hacky 'reactive' thing with a span to show the
     // current value
     const span = document.createElement("span");
-    this.shadowRoot.append(span);
+    this.append(span);
 
     // Create some CSS to apply to the shadow DOM
     const style = document.createElement("style");
@@ -146,7 +148,7 @@ class CustomTextInput extends HTMLElement {
     :host span {
       margin-left: 5px;
     }`;
-    this.shadowRoot.appendChild(style);
+    this.appendChild(style);
 
     // set this so that the input always has a presence within it's associated
     // form. this will also initialize the validation state correctly.
